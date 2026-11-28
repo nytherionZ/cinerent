@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="my_rentals.php" class="nav-film" style="margin-right: 15px;">My Rentals</a>
                     <a href="cart.php" class="nav-film" style="margin-right: 15px;">Cart</a>
-                    <span style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></span>
+                    <a href="profile.php" class="nav-film" style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></a>
                     <a href="logout.php" class="nav-register" style="background-color: #555;">Logout</a>
                 <?php else: ?>
                     <a href="login.php" class="nav-login">Login</a>

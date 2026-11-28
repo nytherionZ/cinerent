@@ -43,9 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_stock'])) {
 
 if (isset($_GET['delete_film'])) {
     $film_id = (int)$_GET['delete_film'];
-    mysqli_query($conn, "DELETE FROM Films WHERE id = $film_id");
-    header("Location: admin.php");
-    exit;
+    try {
+        mysqli_query ($conn, "DELETE FROM CartItems WHERE filmId = $film_id");
+        mysqli_query($conn, "DELETE FROM Films WHERE id = $film_id");
+        header("Location: admin.php");
+        exit;
+    }
+    catch (mysqli_sql_exception $e){
+        $msg = "Cannot delete this film because it is still referenced in rental history.";
+    }
 }
 
 $genres = mysqli_query($conn, "SELECT * FROM Genre ORDER BY name ASC");

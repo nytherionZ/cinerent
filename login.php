@@ -22,7 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
-
+            
+            if(isset($_POST['remember'])) {
+                setcookie('remember_user', $user['id'], time() + (7 * 24 * 60 * 60), "/");
+            }
             header("Location: index.php");
             exit;
         } else {
@@ -63,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="my_rentals.php" class="nav-film" style="margin-right: 15px;">My Rentals</a>
                     <a href="cart.php" class="nav-film" style="margin-right: 15px;">Cart</a>
-                    <span style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></span>
+                    <a href="profile.php" class="nav-film" style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></a>
                     <a href="logout.php" class="nav-register" style="background-color: #555;">Logout</a>
                 <?php else: ?>
                     <a href="login.php" class="nav-login">Login</a>
@@ -97,6 +100,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <input type="password" name="password" id="password" placeholder="Enter your password" required>
                 </div>
                 
+                <div class="formgroup" style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" name="remember" id="remember" style="width: auto;">
+                    <label for="remember" style="font-size: 13px; color: var(--muted); cursor: pointer;">Remember me (1 week)</label>
+                </div>
+
                 <button type="submit" class="btn-reg">Sign In</button>
                 <p class="already">
                 New to CineRent? <a href="register.php" class="login">Create an account</a>

@@ -32,23 +32,36 @@ if (isset($_GET['remove'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['checkout'])) {
-    $cart_check = mysqli_query($conn, "SELECT filmId FROM CartItems WHERE userId = $user_id");
+    $cart_check = mysqli_query($conn, "SELECT CartItems.filmId, Films.title, Films.stock
+    FROM CartItems
+    JOIN Films ON CartItems.filmId = Films.id
+    WHERE CartItems.userId = $user_id");
 
-    if (mysqli_num_rows($cart_check) > 0) {
+    $items_to_rent = [];
+    $out_of_stock = [];
+    while ($row = mysqli_fetch_assoc($cart_check)) {
+        if ($row['stock'] <= 0) {
+            $out_of_stock[] = $row['title'];
+        }
+        else {
+            $items_to_rent[] = (int)$row['filmId'];
+        }
+    }
+
+    if (!empty($out_of_stock)) {
+        $msg = "Cannot checkout. Out of stock: " . implode(', ', $out_of_stock);
+    }
+    elseif (!empty($items_to_rent)) {
         $borrowDate = date('Y-m-d');
         $dueDate = date('Y-m-d', strtotime('+7 days'));
 
         $insert_rental = "INSERT INTO Rentals (userId, borrowDate, dueDate, returnDate, status) VALUES ($user_id, '$borrowDate', '$dueDate', NULL, 'Active')";
-
         if (mysqli_query($conn, $insert_rental)) {
             $rental_id = mysqli_insert_id($conn);
-
-            while ($item = mysqli_fetch_assoc($cart_check)) {
-                $f_id = (int)$item['filmId'];
-                mysqli_query($conn, "INSERT INTO RentalDetails (rentalId, filmId) VALUES ($rental_id, $f_id)");
+            foreach ($items_to_rent as $f_id) {
+                mysqli_query($conn, "INSERT INTO RentalsDetails (rentalId, filmId) VALUES ($rental_id, $f_id)");
                 mysqli_query($conn, "UPDATE Films SET stock = stock - 1 WHERE id = $f_id AND stock > 0");
             }
-            
             mysqli_query($conn, "DELETE FROM CartItems WHERE userId = $user_id");
             $msg = "Checkout successful! Please return your films by $dueDate.";
         }
@@ -103,7 +116,7 @@ $poster = [
             <nav>
                 <a href="my_rentals.php" class="nav-film" style="margin-right: 15px;">My Rentals</a>
                 <a href="cart.php" class="nav-film active" style="color: white; font-weight: bold; margin-right: 15px;">Cart</a>
-                <span style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></span>
+                <a href="profile.php" class="nav-film" style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></a>
                 <a href="logout.php" class="nav-register" style="background-color: #555;">Logout</a>
             </nav>
         </div>
@@ -124,9 +137,9 @@ $poster = [
                     <div class="cart-item">
                         <img src="<?= htmlspecialchars($img_src) ?>" alt="<?= htmlspecialchars($item['title']) ?>">
                         <div class="cart-info">
-                            <span class="genre-card"><?=  htmlspecialchars($item['genre_name']) ?></span>
+                            <span class="genre-card"><?= htmlspecialchars($item['genre_name']) ?></span>
                             <h3><?= htmlspecialchars($item['title']) ?></h3>
-                            <p><?= htmlspecialchars($item['releaseYear']) ?> &bull; Added <?= htmlspecialchars($item['addedDate']) ?></p>
+                            <p><?= htmlspecialchars($item['director'] ?? '-') ?> &bull; <?= htmlspecialchars($item['releaseYear']) ?> &bull; Added <?= htmlspecialchars($item['addedDate']) ?></p>
                         </div>
                         <a href="cart.php?remove=<?= $item['id'] ?>" class="btn-remove">Remove</a>
                     </div>

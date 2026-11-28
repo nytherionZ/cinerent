@@ -6,6 +6,7 @@ $genre_query = mysqli_query($conn, "SELECT * FROM Genre ORDER BY name ASC");
 
 $search = trim($_GET['search'] ?? '');
 $genre_filter = trim($_GET['genre'] ?? '');
+$sort = trim($_GET['sort'] ?? 'title_asc');
 
 $sql = "SELECT Films.*, Genre.name AS genre_name
         FROM Films
@@ -22,7 +23,14 @@ if ($genre_filter != '') {
     $sql .= " AND Films.genreId = $safe_genre";
 }
 
-$sql .= " ORDER BY Films.title ASC";
+$order_map = [
+    'title_asc' => 'Films.title ASC',
+    'title_desc' => 'Films.title DESC',
+    'year_desc' => 'Films.releaseYear DESC',
+    'year_asc' => 'Films.releaseYear ASC'
+];
+
+$sql .= " ORDER BY " . ($order_map[$sort] ?? 'Films.title ASC');
 $result = mysqli_query($conn, $sql);
 
 $poster = [
@@ -70,7 +78,7 @@ $poster = [
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="my_rentals.php" class="nav-film" style="margin-right: 15px;">My Rentals</a>
                     <a href="cart.php" class="nav-film" style="margin-right: 15px;">Cart</a>
-                    <span style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></span>
+                    <a href="profile.php" class="nav-film" style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></a>
                     <a href="logout.php" class="nav-register" style="background-color: #555;">Logout</a>
                 <?php else: ?>
                     <a href="login.php" class="nav-login">Login</a>
@@ -97,6 +105,13 @@ $poster = [
                 <?php endwhile; ?>
             </select>
 
+            <select name="sort">
+                <option value="title_asc" <?= ($sort == 'title_asc') ? 'selected' : ''?>>Title (A-Z)</option>
+                <option value="title_desc" <?= ($sort == 'title_desc') ? 'selected' : ''?>>Title (Z-A)</option>
+                <option value="year_desc" <?= ($sort == 'year_desc') ? 'selected' : ''?>>Newest Year</option>
+                <option value="year_asc" <?= ($sort == 'year_asc') ? 'selected' : ''?>>Oldest Year</option>
+            </select>
+
             <button type="submit" class="btn-filter">Filter</button>
             <?php if ($search != '' || $genre_filter != ''): ?>
                 <a href="catalog.php" class="btn-reset">Reset</a>
@@ -113,7 +128,7 @@ $poster = [
                         <img src="<?= htmlspecialchars($img_src) ?>" alt="<?= htmlspecialchars($film['title']) ?>">
                         <span class="genre-card"><?= htmlspecialchars($film['genre_name']) ?></span>
                         <h3 class="title-card"><?= htmlspecialchars($film['title']) ?></h3>
-                        <span><?= htmlspecialchars($film['releaseYear']) ?></span>
+                        <span><?= htmlspecialchars($film['releaseYear']) ?> &bull; <?= htmlspecialchars($film['director'] ?? '-') ?></span>
 
                         <?php if ($film['stock'] == 0): ?>
                             <span class="stock-status" style="color: red;">&#10006; Out of Stock</span>

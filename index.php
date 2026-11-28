@@ -5,8 +5,8 @@ require 'koneksi.php';
 $featured_sql = "SELECT Films.*, Genre.name AS genre_name
 FROM Films
 JOIN Genre ON Films.genreId = Genre.id
-ORDER BY Films.id ASC
-LIMIT 4";
+ORDER BY RAND()
+LIMIT 6";
 
 $featured_result = mysqli_query($conn, $featured_sql);
 
@@ -55,7 +55,7 @@ $poster = [
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="my_rentals.php" class="nav-film" style="margin-right: 15px;">My Rentals</a>
                     <a href="cart.php" class="nav-film" style="margin-right: 15px;">Cart</a>
-                    <span style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></span>
+                    <a href="profile.php" class="nav-film" style="color: white; margin-right: 15px;">Halo, <?= htmlspecialchars($_SESSION['username']); ?></a>
                     <a href="logout.php" class="nav-register" style="background-color: #555;">Logout</a>
                 <?php else: ?>
                     <a href="login.php" class="nav-login">Login</a>

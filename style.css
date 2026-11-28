@@ -970,3 +970,73 @@ hr.hr-foot {
         grid-template-columns: 1fr;
     }
 }
+
+/* profile */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.stat-card {
+    background-color: #141414;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.stat-number {
+    font-size: 32px;
+    color: white;
+}
+
+.admin-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.admin-nav-card {
+    background-color: #141414;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    text-decoration: none;
+    color: white;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-nav-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
+
+.admin-nav-card h4 {
+    font-size: 18px;
+    margin-bottom: 6px;
+    color: var(--accent);
+}
+
+.admin-nav-card p {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+@media (max-width: 900px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .admin-nav-grid {
+        grid-template-columns: 1fr;
+    }
+}
